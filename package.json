@@ -1,0 +1,23 @@
+{
+  "name": "leaflet-timeline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "author": "Michal Zimmermann",
+  "license": "ISC",
+  "scripts": {
+    "build": "parcel build examples/index.html",
+    "dev": "parcel examples/index.html",
+    "watch": "parcel watch examples/index.html"
+  },
+  "dependencies": {
+    "leaflet": "^1.7.1",
+    "luxon": "^1.25.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.5.17",
+    "@types/luxon": "^1.24.4",
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^4.0.2"
+  }
+}

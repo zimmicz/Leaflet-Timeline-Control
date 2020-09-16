@@ -1,0 +1,28 @@
+.leaflet-timeline-control {
+    align-items: center;
+    background: white;
+    background-clip: padding-box;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 5px;
+    box-sizing: border-box;
+    display: flex;
+    padding: .5rem 1rem;
+}
+
+.leaflet-timeline-control__timeline {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.leaflet-timeline-control__button {
+    margin-right: 1rem;
+}
+
+.leaflet-timeline-control__slot {
+    cursor: pointer;
+    padding: 0 .5rem;
+}
+
+.leaflet-timeline-control__slot--active {
+    font-weight: bold;
+}
