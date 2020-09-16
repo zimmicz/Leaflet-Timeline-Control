@@ -17,8 +17,8 @@ const timelineControl = new TimelineControl({
     onNextStep: (cur) => console.log(cur),
     interval: 1000,
     button: {
-        pausedText: 'Přehrát',
-        playingText: 'Zastavit',
+        pausedText: 'Play',
+        playingText: 'Pause',
     },
     timeline: {
         dateFormat: 'yyyy-MM-dd',

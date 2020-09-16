@@ -1,4 +1,4 @@
-import L from 'leaflet';
+import * as L from 'leaflet';
 import { DateTime, Duration, DurationObjectUnits, Interval } from 'luxon';
 import './style.css';
 
@@ -11,23 +11,6 @@ const CSS_TIMELINE_CLASS = 'leaflet-timeline-control__timeline';
 type Tuple<T> = [T, T];
 type ArrayOfThreeOrMore<T> = [T, T, T, ...T[]];
 type HTMLElementOrNull = HTMLElement | void;
-
-interface BaseTimeline {
-    dateFormat: string;
-    renderSlot?: () => HTMLElement;
-    renderActiveSlot?: () => HTMLElement;
-};
-
-interface RangeTimeline extends BaseTimeline {
-    range: Tuple<Date>;
-    step: DurationObjectUnits;
-}
-
-interface ArrayOfThreeOrMoreTimeline extends BaseTimeline {
-    range: ArrayOfThreeOrMore<Date>;
-}
-
-type Timeline = RangeTimeline | ArrayOfThreeOrMoreTimeline;
 
 interface TimelineOptions extends L.ControlOptions {
     autoplay?: boolean;
@@ -48,12 +31,14 @@ interface TimelineOptions extends L.ControlOptions {
 };
 
 class TimelineControl extends L.Control {
-    container: HTMLElement;
-    map: L.Map;
-    timer: number;
+
     button: HTMLElementOrNull;
+    container: HTMLElement;
     currentStep: DateTime;
+    map: L.Map;
+    options: TimelineOptions;
     steps: DateTime[];
+    timer: number;
 
     constructor(options: TimelineOptions) {
         options.button = options.button || {};
@@ -68,7 +53,7 @@ class TimelineControl extends L.Control {
 
     onAdd(map: L.Map): HTMLElement {
         this.map = map;
-        const { autoplay } = <TimelineOptions>this.options;
+        const { autoplay } = this.options;
 
         if (autoplay) {
             this.createTimer();
@@ -92,7 +77,7 @@ class TimelineControl extends L.Control {
     }
 
     private renderButton(container: HTMLElement): HTMLElementOrNull {
-        const { button } = <TimelineOptions>this.options;
+        const { button } = this.options;
 
         if (!button) {
             return;
@@ -122,7 +107,7 @@ class TimelineControl extends L.Control {
     }
 
     private renderSlots(container: HTMLElement): void {
-        const { dateFormat } = (<TimelineOptions>this.options).timeline;
+        const { dateFormat } = this.options.timeline;
         const timeline = container.querySelector(`.${CSS_TIMELINE_CLASS}`) || L.DomUtil.create('div', CSS_TIMELINE_CLASS);
         container.appendChild(timeline);
         timeline.innerHTML = '';
@@ -145,7 +130,7 @@ class TimelineControl extends L.Control {
     }
 
     private renderSlot(step: DateTime): HTMLElement {
-        const { renderActiveSlot, renderSlot } = (<TimelineOptions>this.options).timeline;
+        const { renderActiveSlot, renderSlot } = this.options.timeline;
         let slot: HTMLElement;
 
         if (step === this.currentStep) {
@@ -158,7 +143,7 @@ class TimelineControl extends L.Control {
     }
 
     private createTimer(): void {
-        const { interval, onNextStep } = <TimelineOptions>this.options;
+        const { interval, onNextStep } = this.options;
 
         this.timer = setInterval(() => {
             const currentIndex = this.steps.findIndex(step => step === this.currentStep);
