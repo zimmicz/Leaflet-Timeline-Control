@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import TimelineControl from '../src/index';
+import '../src/index';
 import '../node_modules/leaflet/dist/leaflet.css';
 
 const BASE_LAYER = L.tileLayer( 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -11,7 +11,7 @@ const map = L.map('map', {
     zoom: 15,
 });
 
-const timelineControl = new TimelineControl({
+const timelineControl = L.control.timeline({
     autoplay: false,
     position: 'bottomleft',
     onNextStep: (cur) => console.log(cur),
@@ -22,6 +22,8 @@ const timelineControl = new TimelineControl({
     },
     timeline: {
         dateFormat: 'yyyy-MM-dd',
+        renderSlot: () => document.createElement('h5'),
+        renderActiveSlot: () => document.createElement('h1'),
         range: [new Date('2020-09-01'), new Date('2020-09-10'), new Date('2020-09-20')],
         step: {
             day: 1,

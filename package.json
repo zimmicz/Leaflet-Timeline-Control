@@ -1,13 +1,14 @@
 {
-  "name": "leaflet-timeline",
+  "name": "@leaflet/timeline",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+  "description": "Leaflet Timeline control",
+  "main": "build/index.js",
   "author": "Michal Zimmermann",
   "license": "ISC",
   "scripts": {
     "build": "parcel build examples/index.html",
     "dev": "parcel examples/index.html",
+    "test:unit": "jest",
     "watch": "parcel watch examples/index.html"
   },
   "dependencies": {
@@ -15,9 +16,13 @@
     "luxon": "^1.25.0"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.14",
     "@types/leaflet": "^1.5.17",
     "@types/luxon": "^1.24.4",
+    "jest": "^26.4.2",
+    "jest-transform-stub": "^2.0.0",
     "parcel-bundler": "^1.12.4",
+    "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
   }
 }

@@ -1,5 +1,6 @@
 import * as L from 'leaflet';
-import { DateTime, Duration, DurationObjectUnits, Interval } from 'luxon';
+import { DateTime, Duration, Interval } from 'luxon';
+import { HTMLElementOrNull } from './types.d';
 import './style.css';
 
 const CSS_ACTIVE_SLOT_CLASS = 'leaflet-timeline-control__slot--active';
@@ -8,39 +9,17 @@ const CSS_CONTROL_CLASS = 'leaflet-timeline-control';
 const CSS_SLOT_CLASS = 'leaflet-timeline-control__slot';
 const CSS_TIMELINE_CLASS = 'leaflet-timeline-control__timeline';
 
-type Tuple<T> = [T, T];
-type ArrayOfThreeOrMore<T> = [T, T, T, ...T[]];
-type HTMLElementOrNull = HTMLElement | void;
-
-interface TimelineOptions extends L.ControlOptions {
-    autoplay?: boolean;
-    button?: {
-        pausedText?: string;
-        playingText?: string;
-        render?: () => HTMLElementOrNull;
-    };
-    timeline: {
-        dateFormat: string;
-        range: Tuple<Date> | ArrayOfThreeOrMore<Date>;
-        renderSlot?: () => HTMLElement;
-        renderActiveSlot?: () => HTMLElement;
-        step?: DurationObjectUnits;
-    };
-    interval: number;
-    onNextStep: (current: Date) => void;
-};
-
 class TimelineControl extends L.Control {
 
     button: HTMLElementOrNull;
     container: HTMLElement;
     currentStep: DateTime;
     map: L.Map;
-    options: TimelineOptions;
+    options: L.Control.TimelineOptions;
     steps: DateTime[];
-    timer: number;
+    timer: NodeJS.Timeout;
 
-    constructor(options: TimelineOptions) {
+    constructor(options: L.Control.TimelineOptions) {
         options.button = options.button || {};
         options.button.pausedText = 'PLAY';
         options.button.playingText = 'PAUSE';
@@ -60,6 +39,8 @@ class TimelineControl extends L.Control {
         }
 
         this.container = this.renderDefault(map);
+        this.button = this.renderButton();
+        this.renderSlots();
 
         return this.container;
     }
@@ -69,14 +50,10 @@ class TimelineControl extends L.Control {
     }
 
     private renderDefault(map: L.Map): HTMLElement {
-        const container = L.DomUtil.create('div', CSS_CONTROL_CLASS, map.getContainer());
-        this.button = this.renderButton(container);
-        this.renderSlots(container);
-
-        return container;
+        return L.DomUtil.create('div', CSS_CONTROL_CLASS, map.getContainer());
     }
 
-    private renderButton(container: HTMLElement): HTMLElementOrNull {
+    private renderButton(): HTMLElementOrNull {
         const { button } = this.options;
 
         if (!button) {
@@ -96,7 +73,7 @@ class TimelineControl extends L.Control {
             return;
         }
 
-        container.appendChild(buttonElement);
+        this.container.appendChild(buttonElement);
         buttonElement.innerHTML = this.timer ? playingText: pausedText;
         buttonElement.addEventListener('click', () => {
             this.timer ? this.destroyTimer() : this.createTimer();
@@ -106,38 +83,55 @@ class TimelineControl extends L.Control {
         return buttonElement;
     }
 
-    private renderSlots(container: HTMLElement): void {
+    private handleSlotClick (slot: HTMLElement, step: DateTime) {
+        const { onNextStep } = this.options;
+        // TODO
+        // When slot is clicked, it has to be replaced with renderActiveSlot result (if that exists)
+        // other slots need to be rendered with renderSlot
+        const slots = document.querySelectorAll('[data-date]');
+        slots.forEach(item => item.classList.remove(CSS_ACTIVE_SLOT_CLASS));
+        slot.classList.add(CSS_ACTIVE_SLOT_CLASS);
+        this.currentStep = step;
+        onNextStep(this.currentStep.toJSDate());
+        this.renderSlots();
+        this.destroyTimer();
+    }
+
+    private renderSlots(): void {
         const { dateFormat } = this.options.timeline;
-        const timeline = container.querySelector(`.${CSS_TIMELINE_CLASS}`) || L.DomUtil.create('div', CSS_TIMELINE_CLASS);
-        container.appendChild(timeline);
+        const timeline = this.container.querySelector(`.${CSS_TIMELINE_CLASS}`) || L.DomUtil.create('div', CSS_TIMELINE_CLASS);
+        this.container.appendChild(timeline);
         timeline.innerHTML = '';
 
-        const handleSlotClick = (slot: HTMLElement) => {
-            const slots = document.querySelectorAll('[data-date]');
-            slots.forEach(item => item.classList.remove(CSS_ACTIVE_SLOT_CLASS));
-            slot.classList.add(CSS_ACTIVE_SLOT_CLASS);
-            this.currentStep = this.steps.find((step: DateTime) => step.toFormat(dateFormat) === slot.dataset.date);
-            this.destroyTimer();
-        };
-
-        this.steps.forEach((step: DateTime) => {
+        this.steps.forEach((step: DateTime, i) => {
             const slot = this.renderSlot(step);
             timeline.appendChild(slot);
-            slot.dataset.date = step.toFormat(dateFormat);
+            slot.dataset.date = `${i}`;
             slot.innerHTML = step.toFormat(dateFormat);
-            slot.addEventListener('click', () => handleSlotClick(slot));
         });
     }
 
+    /*
+     * @param step: DateTime
+     *
+     * Creates slot element:
+     * - if renderActiveSlot callback is defined, use this to render active slot
+     * - if renderActiveSlot callback is not defined, but renderSlot callback is, use that to render active slot
+     * - if renderSlot is defined, use this to render slot
+     * - if none of the two is provided, default to <div>
+     */
     private renderSlot(step: DateTime): HTMLElement {
         const { renderActiveSlot, renderSlot } = this.options.timeline;
         let slot: HTMLElement;
 
         if (step === this.currentStep) {
-            slot = renderActiveSlot ? renderActiveSlot() : L.DomUtil.create('div', `${CSS_SLOT_CLASS} ${CSS_ACTIVE_SLOT_CLASS}`);
+            const fn = renderActiveSlot || renderSlot;
+            slot = fn ? fn() : L.DomUtil.create('div', `${CSS_SLOT_CLASS} ${CSS_ACTIVE_SLOT_CLASS}`);
         } else {
             slot = renderSlot ? renderSlot() : L.DomUtil.create('div', CSS_SLOT_CLASS);
         }
+
+        slot.addEventListener('click', () => this.handleSlotClick(slot, step));
 
         return slot;
     }
@@ -149,13 +143,13 @@ class TimelineControl extends L.Control {
             const currentIndex = this.steps.findIndex(step => step === this.currentStep);
             const nextIndex = currentIndex < this.steps.length - 1 ? currentIndex + 1 : 0;
             this.currentStep = this.steps[nextIndex];
-            this.renderSlots(this.map.getContainer().querySelector(`.${CSS_CONTROL_CLASS}`));
+            this.renderSlots();
             onNextStep(this.currentStep.toJSDate());
         }, interval);
     }
 
     private destroyTimer(): void {
-        const { pausedText } = (<TimelineOptions>this.options).button;
+        const { pausedText } = this.options.button;
         clearTimeout(this.timer);
         this.timer = null;
 
@@ -165,11 +159,13 @@ class TimelineControl extends L.Control {
     }
 
     private createSteps(): DateTime[] {
-        const { range, step } = (<TimelineOptions>this.options).timeline;
+        const { range } = this.options.timeline;
 
         if (range.length > 2) {
             return range.map(date => DateTime.fromJSDate(date));
         }
+
+        const { step } = this.options.timeline as any;
 
         const [start, end] = range;
         const interval = Interval.fromDateTimes(start, end);
@@ -186,4 +182,8 @@ class TimelineControl extends L.Control {
     }
 }
 
-export default TimelineControl;
+L.Control.Timeline = TimelineControl;
+
+L.control.timeline = (opts: L.Control.TimelineOptions) =>  new L.Control.Timeline(opts);
+
+export default L.control.timeline;

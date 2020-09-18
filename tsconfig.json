@@ -4,12 +4,16 @@
         "declarationMap": true,
         "module": "commonjs",
         "noImplicitAny": true,
-        "outDir": "./dist",
+        "outDir": "./build",
         "preserveConstEnums": true,
         "removeComments": true,
         "rootDir": "./src",
         "sourceMap": true,
         "target": "ES2018"
     },
-    "exclude": ["examples/**/*", "dist/**/*"]
+    "exclude": [
+        "build/**/*",
+        "dist/**/*",
+        "examples/**/*"
+    ]
 }
