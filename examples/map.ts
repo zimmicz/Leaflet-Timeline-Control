@@ -24,7 +24,7 @@ const timelineControl = L.control.timeline({
         dateFormat: 'yyyy-MM-dd',
         renderSlot: () => document.createElement('h5'),
         renderActiveSlot: () => document.createElement('h1'),
-        range: [new Date('2020-09-01'), new Date('2020-09-10'), new Date('2020-09-20')],
+        range: [new Date('2020-09-01'), new Date('2020-09-10')],
         step: {
             day: 1,
         },
