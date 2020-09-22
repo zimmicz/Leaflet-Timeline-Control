@@ -1,5 +1,5 @@
 {
-  "name": "@leaflet/timeline",
+  "name": "leaflet.timeline.control",
   "version": "1.0.0",
   "description": "Leaflet Timeline control",
   "main": "build/index.js",
