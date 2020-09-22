@@ -11,13 +11,15 @@
     "timeline"
   ],
   "scripts": {
-    "build": "parcel build examples/index.html",
+    "build": "tsc",
     "dev": "parcel examples/index.html",
     "test:unit": "jest",
     "watch": "parcel watch examples/index.html"
   },
   "files": [
-    "build"
+    "build/index.d.ts",
+    "build/index.d.ts.map",
+    "build/index.js"
   ],
   "dependencies": {
     "leaflet": "^1.7.1",
