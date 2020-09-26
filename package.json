@@ -1,5 +1,6 @@
 {
   "name": "leaflet.timeline.control",
+  "repository": "https://github.com/zimmicz/Leaflet-Timeline-Control",
   "version": "1.0.0",
   "description": "Leaflet Timeline control",
   "main": "build/index.js",
@@ -13,6 +14,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "parcel examples/index.html",
+    "prepublish": "npm run build",
     "test:unit": "jest",
     "watch": "parcel watch examples/index.html"
   },
@@ -22,7 +24,6 @@
     "build/index.js"
   ],
   "dependencies": {
-    "leaflet": "^1.7.1",
     "luxon": "^1.25.0"
   },
   "devDependencies": {
@@ -35,8 +36,12 @@
     "eslint-config-typescript": "^3.0.0",
     "jest": "^26.4.2",
     "jest-transform-stub": "^2.0.0",
+    "leaflet": "^1.7.1",
     "parcel-bundler": "^1.12.4",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
+  },
+  "peerDependencies": {
+    "leaflet": "^1.7.1"
   }
 }

@@ -1,6 +1,6 @@
 import * as L from 'leaflet';
 import { DateTime, Duration, Interval } from 'luxon';
-import { HTMLElementOrNull } from './types.d';
+import { TupleRange } from './types.d';
 import './style.css';
 
 const CSS_ACTIVE_SLOT_CLASS = 'leaflet-timeline-control__slot--active';
@@ -11,7 +11,7 @@ const CSS_TIMELINE_CLASS = 'leaflet-timeline-control__timeline';
 
 class TimelineControl extends L.Control {
 
-  button: HTMLElementOrNull;
+  button: HTMLElement;
   container: HTMLElement;
   currentStep: DateTime;
   map: L.Map;
@@ -20,10 +20,6 @@ class TimelineControl extends L.Control {
   timer: NodeJS.Timeout;
 
   constructor(options: L.Control.TimelineOptions) {
-    options.button = options.button || {};
-    options.button.pausedText = 'PLAY';
-    options.button.playingText = 'PAUSE';
-
     super(options);
 
     this.steps = this.createSteps();
@@ -53,7 +49,7 @@ class TimelineControl extends L.Control {
     return L.DomUtil.create('div', CSS_CONTROL_CLASS, map.getContainer());
   }
 
-  private renderButton(): HTMLElementOrNull {
+  private renderButton(): HTMLElement | null {
     const { button } = this.options;
 
     if (!button) {
@@ -75,9 +71,6 @@ class TimelineControl extends L.Control {
 
   private handleSlotClick (slot: HTMLElement, step: DateTime) {
     const { onNextStep } = this.options;
-    // TODO
-    // When slot is clicked, it has to be replaced with renderActiveSlot result (if that exists)
-    // other slots need to be rendered with renderSlot
     const slots = document.querySelectorAll('[data-date]');
     slots.forEach(item => item.classList.remove(CSS_ACTIVE_SLOT_CLASS));
     slot.classList.add(CSS_ACTIVE_SLOT_CLASS);
@@ -139,11 +132,11 @@ class TimelineControl extends L.Control {
   }
 
   private destroyTimer(): void {
-    const { pausedText } = this.options.button;
     clearTimeout(this.timer);
     this.timer = null;
 
     if (this.button) {
+      const { pausedText } = this.options.button;
       this.button.innerHTML = pausedText;
     }
   }
@@ -155,7 +148,7 @@ class TimelineControl extends L.Control {
       return range.map(date => DateTime.fromJSDate(date));
     }
 
-    const { step } = this.options.timeline as any;
+    const { step } = <TupleRange>this.options.timeline;
 
     const [start, end] = range;
     const interval = Interval.fromDateTimes(start, end);

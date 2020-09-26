@@ -2,13 +2,13 @@
 
 Examples
 --
-TODO
+[CodeSandbox](https://codesandbox.io/s/leaflet-timeline-control-gi8kr)
 
 Installation
 --
 
 ```
-npm install leaflet.timeline.control
+npm install "leaflet.timeline.control"
 ```
 
 Import

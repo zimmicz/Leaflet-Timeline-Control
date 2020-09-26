@@ -2,14 +2,17 @@ import { DurationObjectUnits } from 'luxon';
 
 export type Tuple<T> = [T, T];
 export type ArrayOfThreeOrMore<T> = [T, T, T, ...T[]];
-export type HTMLElementOrNull = HTMLElement | void;
 
-type Range = {
+export type TupleRange = {
   range: Tuple<Date>;
   step: DurationObjectUnits;
-} | {
+};
+
+type TripleOrMoreRange = {
   range: ArrayOfThreeOrMore<Date>;
 };
+
+type Range = TupleRange | TripleOrMoreRange;
 
 declare module 'leaflet' {
   namespace Control {
@@ -19,7 +22,7 @@ declare module 'leaflet' {
       button?: {
         pausedText?: string;
         playingText?: string;
-        render?: () => HTMLElementOrNull;
+        render?: () => HTMLElement;
       };
       timeline: {
         dateFormat: string;
