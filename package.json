@@ -1,7 +1,7 @@
 {
   "name": "leaflet.timeline.control",
   "repository": "https://github.com/zimmicz/Leaflet-Timeline-Control",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Leaflet Timeline control",
   "main": "build/index.js",
   "author": "Michal Zimmermann",
