@@ -2,7 +2,7 @@
 
 Examples
 --
-[CodeSandbox](https://codesandbox.io/s/leaflet-timeline-control-gi8kr)
+[CodeSandbox](https://codesandbox.io/s/leaflet-timeline-control-ibyby)
 
 Installation
 --

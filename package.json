@@ -1,7 +1,7 @@
 {
   "name": "leaflet.timeline.control",
   "repository": "https://github.com/zimmicz/Leaflet-Timeline-Control",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Leaflet Timeline control",
   "main": "build/index.js",
   "author": "Michal Zimmermann",
@@ -12,7 +12,7 @@
     "timeline"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp ./src/style.css build/style.css",
     "dev": "parcel examples/index.html",
     "prepublish": "npm run build",
     "test:unit": "jest",
@@ -21,7 +21,8 @@
   "files": [
     "build/index.d.ts",
     "build/index.d.ts.map",
-    "build/index.js"
+    "build/index.js",
+    "build/style.css"
   ],
   "dependencies": {
     "luxon": "^1.25.0"
